@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Sensitive Field Validator</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{fragments/layout :: sidebar('home')}"></aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Welcome back, <span th:text="${validatorName}">Validator</span> 👋</h1>
+      <p>Automated sensitive data discovery, classification &amp; privacy masking platform.</p>
+    </div>
+
+    <!-- Quick Action Cards -->
+    <div class="grid-cards">
+      <a class="tile" th:href="@{/data-loading}">
+        <div class="tile-icon">📂</div>
+        <h3>Data Loading</h3>
+        <p>Upload CSV datasets for automatic sensitive field scanning and row-level masking.</p>
+        <div class="tile-arrow">Upload CSV &rarr;</div>
+      </a>
+      <a class="tile" th:href="@{/history}">
+        <div class="tile-icon">📜</div>
+        <h3>Audit History</h3>
+        <p>Review logs of past CSV uploads, sensitive field counts, and masked previews.</p>
+        <div class="tile-arrow">View Logs &rarr;</div>
+      </a>
+      <a class="tile" th:href="@{/audit-log}">
+        <div class="tile-icon">🧾</div>
+        <h3>Audit Log</h3>
+        <p>Follow every pipeline stage, warning and rollback for your uploads.</p>
+        <div class="tile-arrow">Open Log &rarr;</div>
+      </a>
+      <a class="tile" th:href="@{/payment}">
+        <div class="tile-icon">⚡</div>
+        <h3>Upgrade Plan</h3>
+        <p>Explore Pro &amp; Enterprise tiers for increased scanning volume and custom rules.</p>
+        <div class="tile-arrow">View Plans &rarr;</div>
+      </a>
+    </div>
+
+    <!-- User Guide / How to Use Section -->
+    <div class="card">
+      <div class="guide-header">
+        <span style="font-size: 1.5rem;">📖</span>
+        <h2>How to Use Sensitive Field Validator</h2>
+      </div>
+
+      <div class="guide-steps">
+        <div class="step-card">
+          <div class="step-number">STEP 1</div>
+          <h4><span>📂</span> Upload Data File</h4>
+          <p>Navigate to <strong>Data Loading</strong> on the left sidebar. Choose your <code>.csv</code> file and click <strong>Load File</strong>. The system extracts columns and row samples for analysis.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">STEP 2</div>
+          <h4><span>🔍</span> Automatic Discovery</h4>
+          <p>The discovery engine automatically scans headers and sample values to detect sensitive data types (PII, SSN, Credit Cards, Emails, Phone Numbers, Passwords, etc.).</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">STEP 3</div>
+          <h4><span>📜</span> Review Audit Trail</h4>
+          <p>Open <strong>History</strong> for past uploads and <strong>Audit Log</strong> for every pipeline stage, warning and rollback.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-number">STEP 4</div>
+          <h4><span>⚡</span> Plan Upgrades</h4>
+          <p>Visit the <strong>Upgrade</strong> page to explore higher throughput tiers, custom compliance policies, and team management features.</p>
+        </div>
+      </div>
+
+      <h3 style="margin: 24px 0 12px; font-size: 1.05rem; font-weight: 700;">The 7 Sensitive Types Detected &amp; How They Are Masked</h3>
+      <div class="types-grid">
+        <div class="type-badge">
+          <span class="type-name">📧 Email</span>
+          <span class="type-mask">a***@example.com</span>
+        </div>
+        <div class="type-badge">
+          <span class="type-name">📱 Phone</span>
+          <span class="type-mask">********10</span>
+        </div>
+        <div class="type-badge">
+          <span class="type-name">💳 Card number</span>
+          <span class="type-mask">************1111</span>
+        </div>
+        <div class="type-badge">
+          <span class="type-name">🆔 PAN</span>
+          <span class="type-mask">ABCDE****F</span>
+        </div>
+        <div class="type-badge">
+          <span class="type-name">🪪 Aadhaar</span>
+          <span class="type-mask">XXXX XXXX 9012</span>
+        </div>
+        <div class="type-badge">
+          <span class="type-name">🔑 Password</span>
+          <span class="type-mask">********</span>
+        </div>
+        <div class="type-badge">
+          <span class="type-name">🧾 GSTIN</span>
+          <span class="type-mask">27*********F1Z5</span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

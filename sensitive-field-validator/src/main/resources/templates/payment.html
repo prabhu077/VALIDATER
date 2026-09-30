@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upgrade - Sensitive Field Validator</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-shell">
+  <aside th:replace="~{fragments/layout :: sidebar('payment')}"></aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Upgrade Plan ⚡</h1>
+      <p>Select a plan level to unlock higher throughput, custom discovery rules &amp; team features.</p>
+    </div>
+
+    <div class="card">
+      <span class="demo-tag">DEMO CHECKOUT SHOWCASE</span>
+
+      <div class="alert alert-success" th:if="${success}">
+        <span>🎉</span> Payment successful (demo) -- <strong th:text="${plan}"></strong> plan activated for
+        <strong th:text="${validatorName}"></strong>. No charges were made.
+      </div>
+
+      <form th:action="@{/payment}" method="post">
+        <div class="plan-options">
+          <label class="plan-option">
+            <input type="radio" name="plan" value="Basic" checked>
+            <div>Basic</div>
+            <div class="price">Free</div>
+          </label>
+          <label class="plan-option">
+            <input type="radio" name="plan" value="Pro">
+            <div>Pro</div>
+            <div class="price">$9/mo</div>
+          </label>
+          <label class="plan-option">
+            <input type="radio" name="plan" value="Team">
+            <div>Team</div>
+            <div class="price">$29/mo</div>
+          </label>
+        </div>
+
+        <div class="field">
+          <label for="cardName">Name on Card</label>
+          <input type="text" id="cardName" placeholder="Not stored - demo checkout only">
+        </div>
+        <div class="card-row">
+          <div class="field">
+            <label for="cardNumber">Card Number</label>
+            <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19">
+          </div>
+          <div class="field">
+            <label for="cardExpiry">Expiry Date</label>
+            <input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5">
+          </div>
+        </div>
+        <div class="field" style="max-width:140px;">
+          <label for="cardCvv">CVV Code</label>
+          <input type="text" id="cardCvv" placeholder="123" maxlength="4">
+        </div>
+
+        <button type="submit" class="btn" style="width:auto; padding-left:32px; padding-right:32px;">
+          <span>⚡</span> Confirm Plan Upgrade
+        </button>
+      </form>
+    </div>
+  </main>
+</div>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

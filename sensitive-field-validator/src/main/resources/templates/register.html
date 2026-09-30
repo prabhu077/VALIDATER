@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Register - Sensitive Field Validator</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1>Create your account</h1>
+      <p class="subtitle">Register as a validator to get started</p>
+
+      <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+      <form th:action="@{/register}" method="post">
+        <div class="field">
+          <label for="name">Validator Name</label>
+          <input type="text" id="name" name="name" th:value="${name}" required autofocus>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" th:value="${email}" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <div class="field">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" name="confirmPassword" required>
+        </div>
+        <button type="submit" class="btn">Register</button>
+      </form>
+
+      <div class="form-footer">
+        Already have an account? <a th:href="@{/login}">Sign in</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

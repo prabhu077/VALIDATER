@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Audit Log - Sensitive Field Validator</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-shell">
+
+  <aside th:replace="~{fragments/layout :: sidebar('audit')}"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Audit Log 🧾</h1>
+      <p>Every pipeline stage of your uploads, downloads and rollbacks. Only counts and file names are logged, never cell values.</p>
+    </div>
+
+    <div class="card">
+      <div class="kpis kpis-3">
+        <div class="kpi"><div class="kpi-value" th:text="${infoCount}">0</div><div class="kpi-label">Info</div></div>
+        <div class="kpi" th:classappend="${warnCount > 0} ? 'kpi-warn'"><div class="kpi-value" th:text="${warnCount}">0</div><div class="kpi-label">Warnings</div></div>
+        <div class="kpi" th:classappend="${errorCount > 0} ? 'kpi-danger'"><div class="kpi-value" th:text="${errorCount}">0</div><div class="kpi-label">Errors</div></div>
+      </div>
+
+      <div class="chips chips-links" role="group" aria-label="Filter by level">
+        <a th:href="@{/audit-log(level='ALL')}"   class="chip" th:classappend="${level == 'ALL'} ? 'active'">All</a>
+        <a th:href="@{/audit-log(level='INFO')}"  class="chip" th:classappend="${level == 'INFO'} ? 'active'">Info</a>
+        <a th:href="@{/audit-log(level='WARN')}"  class="chip" th:classappend="${level == 'WARN'} ? 'active'">Warnings</a>
+        <a th:href="@{/audit-log(level='ERROR')}" class="chip" th:classappend="${level == 'ERROR'} ? 'active'">Errors</a>
+      </div>
+
+      <div class="table-wrap" th:if="${!#lists.isEmpty(events)}">
+        <table class="review-table">
+          <thead>
+            <tr><th>Time</th><th>Level</th><th>Step</th><th>Message</th><th>Run</th></tr>
+          </thead>
+          <tbody>
+            <tr th:each="e : ${events}">
+              <td class="nowrap" th:text="${e.time}">time</td>
+              <td><span class="lvl" th:classappend="|lvl-${e.level}|" th:text="${e.level}">INFO</span></td>
+              <td><code th:text="${e.step}">STEP</code></td>
+              <td th:text="${e.message}">message</td>
+              <td><code th:text="${e.run}">abcd1234</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="empty-state" th:if="${#lists.isEmpty(events)}">
+        <p>No audit events yet. <a th:href="@{/data-loading}">Upload a CSV</a> and every stage will show up here.</p>
+      </div>
+      <p class="legend-note">The log is held in memory and resets when the app restarts. Showing the newest 300 events.</p>
+    </div>
+  </main>
+</div>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

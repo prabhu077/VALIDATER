@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign In - Sensitive Field Validator</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1>Sign in</h1>
+      <p class="subtitle">Sensitive Field Discovery &amp; Masking Validator</p>
+
+      <div class="alert alert-info" th:if="${info}" th:text="${info}"></div>
+      <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+
+      <form th:action="@{/login}" method="post">
+        <div class="field">
+          <label for="name">Validator Name</label>
+          <input type="text" id="name" name="name" th:value="${name}" required autofocus>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn">Sign In</button>
+      </form>
+
+      <div class="form-footer">
+        New here? <a th:href="@{/register}">Create an account</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

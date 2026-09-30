@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!--/* Shared sidebar. Usage:  <aside th:replace="~{fragments/layout :: sidebar('home')}"></aside>
+       'active' is one of: home | data | history | audit | payment  */-->
+<aside class="sidebar" th:fragment="sidebar(active)">
+  <div class="sidebar-brand">
+    <div class="logo-icon">🛡️</div>
+    <div class="brand-title">Sensitive Field<br><span>Validator</span></div>
+  </div>
+
+  <div class="user-badge">
+    <div class="user-avatar" th:text="${#strings.toUpperCase(#strings.substring(validatorName,0,1))}">P</div>
+    <div class="user-info">
+      <div class="user-name" th:text="${validatorName}">Validator</div>
+      <div class="user-role">Validator Account</div>
+    </div>
+  </div>
+
+  <div class="sidebar-nav-title">Navigation</div>
+  <nav class="sidebar-nav" aria-label="Main navigation">
+    <a th:href="@{/home}" class="nav-item" th:classappend="${active == 'home'} ? 'active'">
+      <span class="nav-icon">🏠</span><span class="nav-text">Home</span>
+    </a>
+    <a th:href="@{/data-loading}" class="nav-item" th:classappend="${active == 'data'} ? 'active'">
+      <span class="nav-icon">📂</span><span class="nav-text">Data Loading</span>
+    </a>
+    <a th:href="@{/history}" class="nav-item" th:classappend="${active == 'history'} ? 'active'">
+      <span class="nav-icon">📜</span><span class="nav-text">History</span>
+    </a>
+    <a th:href="@{/audit-log}" class="nav-item" th:classappend="${active == 'audit'} ? 'active'">
+      <span class="nav-icon">🧾</span><span class="nav-text">Audit Log</span>
+    </a>
+    <a th:href="@{/payment}" class="nav-item" th:classappend="${active == 'payment'} ? 'active'">
+      <span class="nav-icon">⚡</span><span class="nav-text">Upgrade</span>
+    </a>
+    <a th:href="@{/logout}" class="nav-item nav-logout">
+      <span class="nav-icon">🚪</span><span class="nav-text">Logout</span>
+    </a>
+  </nav>
+</aside>
+</body>
+</html>

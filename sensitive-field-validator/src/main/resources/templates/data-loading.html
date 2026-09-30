@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Loading - Sensitive Field Validator</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-shell">
+
+  <aside th:replace="~{fragments/layout :: sidebar('data')}"></aside>
+
+  <main class="main-content">
+    <div class="page-header">
+      <h1>Data Loading 📂</h1>
+      <p>Upload a CSV to classify its columns, preview masked values and check that every mask hides what it should.</p>
+    </div>
+
+    <!-- ── Upload ─────────────────────────────────────────────────────────── -->
+    <div class="card">
+      <div class="alert alert-error" role="alert" th:if="${uploadError}">
+        <span>⚠️</span> <span th:text="${uploadError}"></span>
+      </div>
+
+      <form id="csvUploadForm" th:action="@{/data-loading/upload}" method="post" enctype="multipart/form-data" novalidate>
+        <label class="dropzone" id="dropzone" for="csvFile">
+          <input type="file" id="csvFile" name="csvFile" accept=".csv,text/csv" class="sr-only">
+          <span class="dz-icon" aria-hidden="true">📁</span>
+          <span class="dz-title">Drop a CSV here, or <u>browse</u></span>
+          <span class="dz-hint">Up to 10 MB · UTF-8 · first row must be the header</span>
+          <span class="dz-file" id="dzFile" hidden></span>
+        </label>
+        <div class="dz-error" id="dzError" role="alert" hidden></div>
+
+        <div class="dz-actions">
+          <button type="submit" id="uploadSubmitBtn" class="btn btn-inline" disabled>
+            <span aria-hidden="true">🚀</span> Scan file
+          </button>
+        </div>
+        <div id="uploadSpinner" class="spinner"></div>
+        <div id="uploadLoadingText" class="loading-text">Parsing, detecting and validating masks…</div>
+      </form>
+    </div>
+
+    <!-- ── Report ─────────────────────────────────────────────────────────── -->
+    <section class="card" th:if="${uploadSuccess}" aria-labelledby="reportTitle">
+
+      <div class="results-head">
+        <div>
+          <h2 id="reportTitle">Validation report</h2>
+          <p class="muted">
+            <strong th:text="${fileName}">file.csv</strong> ·
+            run <code th:text="${summary.runId}">abcd1234</code> ·
+            scanned in <span th:text="${summary.elapsedMs}">0</span> ms
+          </p>
+        </div>
+        <form th:action="@{/data-loading/clear}" method="post">
+          <button type="submit" class="btn-ghost" title="Remove this dataset from your session">Discard dataset</button>
+        </form>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="kpi-value" th:text="${summary.rows}">0</div>
+          <div class="kpi-label">Data rows</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-value" th:text="${summary.columns}">0</div>
+          <div class="kpi-label">Columns</div>
+        </div>
+        <div class="kpi" th:classappend="${summary.sensitiveCount > 0} ? 'kpi-danger'">
+          <div class="kpi-value" th:text="${summary.sensitiveCount}">0</div>
+          <div class="kpi-label">Sensitive columns</div>
+        </div>
+        <div class="kpi" th:classappend="${summary.reviewCount > 0} ? 'kpi-warn' : 'kpi-good'">
+          <div class="kpi-value" th:text="${summary.reviewCount}">0</div>
+          <div class="kpi-label">Need review</div>
+        </div>
+        <div class="kpi" th:classappend="${summary.checksFailed > 0} ? 'kpi-warn' : 'kpi-good'">
+          <div class="kpi-value" th:text="|${summary.checksPassed}/${summary.checksTotal}|">0/0</div>
+          <div class="kpi-label">Mask checks passed</div>
+        </div>
+      </div>
+
+      <div class="breakdown" th:if="${!#lists.isEmpty(typeBreakdown)}">
+        <div class="bd-bar" role="img" aria-label="Sensitive columns by type">
+          <span th:each="b : ${typeBreakdown}" class="bd-seg" th:classappend="|t-${b.type}|"
+                th:style="|flex:${b.count}|" th:title="|${b.type}: ${b.count}|"></span>
+        </div>
+        <ul class="bd-legend">
+          <li th:each="b : ${typeBreakdown}">
+            <i class="bd-dot" th:classappend="|t-${b.type}|"></i>
+            <span th:text="${b.type}">EMAIL</span> <b th:text="${b.count}">1</b>
+          </li>
+        </ul>
+      </div>
+
+      <div class="toolbar">
+        <input type="search" id="colSearch" class="search" placeholder="Filter columns…" aria-label="Filter columns by name" autocomplete="off">
+        <div class="chips" role="group" aria-label="Show columns">
+          <button type="button" class="chip active" data-filter="all">All <span th:text="${summary.columns}">0</span></button>
+          <button type="button" class="chip" data-filter="sensitive">Sensitive <span th:text="${summary.sensitiveCount}">0</span></button>
+          <button type="button" class="chip" data-filter="clean">Non-sensitive <span th:text="${summary.cleanCount}">0</span></button>
+          <button type="button" class="chip" data-filter="review">Needs review <span th:text="${summary.reviewCount}">0</span></button>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table class="review-table" id="reviewTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Column</th>
+              <th>Type</th>
+              <th title="Value pattern = regex matched the data. Column name = header keyword only.">Detected via</th>
+              <th>Preview</th>
+              <th title="Masking invariants (non-leakage and structure) run on up to 5 values per sensitive column.">Mask check</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr th:each="row : ${reviewRows}"
+                th:attr="data-name=${#strings.toLowerCase(row.column)},data-sensitive=${row.sensitive},data-review=${row.review}">
+              <td class="idx" th:text="${row.index}">1</td>
+              <td>
+                <span class="col-name" th:text="${row.column}">col</span>
+                <span class="fill" th:text="${row.filled == 0} ? 'empty column' : |${row.filled}/${row.total} filled|">10/10 filled</span>
+              </td>
+              <td>
+                <span class="type-chip" th:classappend="${row.sensitive} ? |t-${row.type}| : 'non-sensitive'" th:text="${row.type}">TYPE</span>
+              </td>
+              <td>
+                <span class="sig" th:classappend="${row.signal == 'Column name'} ? 'sig-weak'" th:text="${row.signal}">Value pattern</span>
+              </td>
+              <td>
+                <span th:if="${row.sensitive}" class="preview masked"><span aria-hidden="true">🔒</span> <span th:text="${row.preview != '' ? row.preview : '—'}">***</span></span>
+                <span th:unless="${row.sensitive}" class="preview" th:text="${row.preview != '' ? row.preview : '—'}">—</span>
+              </td>
+              <td>
+                <span th:unless="${row.sensitive}" class="muted">n/a</span>
+                <span th:if="${row.sensitive and row.checked == 0}" class="muted">no samples</span>
+                <span th:if="${row.sensitive and row.checked > 0 and row.failed == 0}" class="check ok" th:text="|✓ ${row.checked}/${row.checked} passed|">✓</span>
+                <span th:if="${row.sensitive and row.failed > 0}" class="check bad" th:title="${row.violations}" th:text="|✗ ${row.failed} of ${row.checked} failed|">✗</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="empty-state" id="noMatches" hidden>No columns match that filter.</div>
+      </div>
+
+      <p class="legend-note">
+        <strong>Needs review</strong> = the type was inferred from the header alone (the values did not confirm it),
+        or a masking invariant failed. Hover a failed check to see which rule.
+      </p>
+
+      <details class="trace">
+        <summary>Pipeline trace · <span th:text="${#lists.size(stages)}">5</span> stages</summary>
+        <ol>
+          <li th:each="st : ${stages}">
+            <i class="dot" th:classappend="${st.status == 'OK'} ? 'ok' : 'bad'"></i>
+            <span class="st-name" th:text="${st.name}">STAGE</span>
+            <span class="st-detail" th:text="${st.detail}">detail</span>
+            <span class="st-ms" th:text="|${st.millis} ms|">0 ms</span>
+          </li>
+        </ol>
+        <p class="muted small">Every stage is also written to the <a th:href="@{/audit-log}">Audit Log</a>.</p>
+      </details>
+
+      <div class="download-bar">
+        <div class="dl-info">
+          <strong>🔐 Encrypted dataset ready</strong>
+          Sensitive columns are AES-128-CBC encrypted cell by cell; non-sensitive columns are unchanged.
+        </div>
+        <a th:href="@{/data-loading/download-encrypted}" id="downloadEncryptedBtn" class="btn-download">
+          <span aria-hidden="true">🔒</span> Download encrypted CSV
+        </a>
+      </div>
+    </section>
+  </main>
+</div>
+<script th:src="@{/js/script.js}"></script>
+</body>
+</html>

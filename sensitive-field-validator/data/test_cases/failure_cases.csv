@@ -1,0 +1,7 @@
+scenario,ambiguous_column,phone_or_card,pan_or_text,mixed_digits,col_name_lie,col_name_email_but_phone,col_card_but_short,col_gst_but_pan,expected_note
+FP_NAME_VS_VALUE,generic_id,9876543210,ABCDE1234F,1234567890123456,notanemail,9876543210,411111,ABCDE1234F,phone-col-name-should-not-override-card-value
+FN_NO_KEYWORD_MATCH,record_number,9876543210,ABCDE1234F,1234567890123456,user@domain.com,9876543210,4111111111111111,27ABCDE1234F1Z5,col-name-generic-but-value-is-sensitive
+FP_MIXED_COLUMN,data_value,9876543210,HELLO WORLD,1234567890123456,user@domain.com,9876543210,4111111111111111,27ABCDE1234F1Z5,half-sensitive-half-not
+MAJORITY_VOTE_TEST,identifier,9123456789,ABCDE1234F,4111111111111111,u1@x.com,8888888888,5500000000000004,27FGHIJ5678K2Z3,majority-should-win
+ZERO_SAMPLE,empty_col,,,,,,,,no-values-col-should-be-non-sensitive
+SINGLE_SAMPLE,one_row,9876543210,ABCDE1234F,4111111111111111,u@d.com,9876543210,4111111111111111,27ABCDE1234F1Z5,single-value-must-still-detect

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Field Verification - Sensitive Field Validator</title>
+  <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div class="app-shell">
+  <div class="topbar">
+    <div class="brand">Sensitive Field <span>Validator</span></div>
+    <div class="nav-links">
+      <a th:href="@{/home}">Home</a>
+      <a th:href="@{/verify}" class="active">Field Verification</a>
+      <a th:href="@{/data-loading}">Data Loading</a>
+      <a th:href="@{/history}">History</a>
+      <a th:href="@{/payment}">Upgrade</a>
+      <a th:href="@{/logout}">Logout</a>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="page-header">
+      <h1>Field Verification</h1>
+      <p>Enter a field name and a few sample values to check it.</p>
+    </div>
+
+    <div class="card">
+      <form th:action="@{/verify}" method="post">
+        <div class="field">
+          <label for="fieldName">Field Name</label>
+          <input type="text" id="fieldName" name="fieldName" placeholder="e.g. customer_email" th:value="${fieldName}" required>
+        </div>
+        <div class="field">
+          <label for="sampleValues">Sample Values (one per line, or comma-separated)</label>
+          <textarea id="sampleValues" name="sampleValues" placeholder="jane.doe@example.com&#10;john.smith@example.com" required></textarea>
+        </div>
+        <button type="submit" class="btn" style="width:auto; padding-left:28px; padding-right:28px;">Verify Field</button>
+      </form>
+
+      <div class="result-box" th:if="${submitted}">
+        <div class="result-row">
+          <span class="label">Field Name</span>
+          <span class="value" th:text="${fieldName}"></span>
+        </div>
+        <div class="result-row">
+          <span class="label">Detected Type</span>
+          <span class="value" th:text="${detectedType}"></span>
+        </div>
+        <div class="result-row">
+          <span class="label">Status</span>
+          <span>
+            <span class="badge badge-sensitive" th:if="${sensitive}">Sensitive</span>
+            <span class="badge badge-clear" th:unless="${sensitive}">Not Sensitive</span>
+          </span>
+        </div>
+        <div class="result-row">
+          <span class="label">Masked Preview</span>
+          <span class="value" th:text="${maskedPreview}"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
